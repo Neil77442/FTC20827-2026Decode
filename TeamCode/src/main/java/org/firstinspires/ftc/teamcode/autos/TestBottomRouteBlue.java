@@ -103,11 +103,11 @@ public class TestBottomRouteBlue extends XKCommandOpmode
                 break;
 
             case INTAKE_BALLS1:
-                IntakeBalls(0);
+                IntakeBalls(2);
                 break;
 
             case MOVE_TO_SHOOTING_POSITION1:
-                moveToShootingPos(1);//远射位置,现在改为1(中射位置)是因为水下天花板太矮了
+                moveToShootingPos(1);
                 break;
 
 
@@ -165,7 +165,6 @@ public class TestBottomRouteBlue extends XKCommandOpmode
             shooter.setShooter(Constants.shooter125cm).schedule();
             intake.startIntake(false).schedule();
         }
-
 
         // 驱动到第一个位置
         AutoDrive.Output out = autoDrive.driveToAdaptive(
@@ -337,7 +336,7 @@ public class TestBottomRouteBlue extends XKCommandOpmode
         shooter = new Shooter(hardwares);
         intake = new Intake(hardwares);
         odo = new OdometerData(hardwares.sensors.odo);
-        hardwares.sensors.odo.setHeading(45, AngleUnit.DEGREES);
+        hardwares.sensors.odo.setHeading(0, AngleUnit.DEGREES);
         telemetry.addData("Auto Status", "Initialized");
     }
 }

@@ -43,14 +43,15 @@ public class TeleOp20827 extends XKCommandOpmode {
 
 
         driveCommand = new Drive.DriveCommand(
-                drive,
-                gamepad1::getLeftX,
-                gamepad1::getLeftY,
-                ()->-gamepad1.getRightX(),
-                ()-> new OdometerData(hardwares.sensors.odo),
-                ()-> (gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5 ) ? 0.5 : 1,
-                ()-> true,
-            ()->true);
+            drive,
+            gamepad1::getLeftX,
+            gamepad1::getLeftY,
+            ()->-gamepad1.getRightX(),
+            ()-> new OdometerData(hardwares.sensors.odo),
+            ()-> (gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5 ) ? 0.5 : 1,
+            ()-> true,
+            ()->true
+        );
 
         CommandScheduler.getInstance().schedule(driveCommand);
     }
@@ -81,9 +82,6 @@ public class TeleOp20827 extends XKCommandOpmode {
         telemetry.addData("Y damping", driveCommand.dampedY - gamepad1.getLeftY());
         telemetry.addData("Rotate damping", driveCommand.dampedRotate - (-gamepad1.getRightX()));
 
-        telemetry.addData("Front Shooter PIDF", hardwares.motors.shooterFront.getPIDFCoefficients(hardwares.motors.shooterFront.getMode()));
-        telemetry.addData("Front Shooter PIDF", hardwares.motors.shooterFront.getPIDFCoefficients(hardwares.motors.shooterFront.getMode()));
-
         telemetry.update();
     }
 
@@ -102,7 +100,7 @@ public class TeleOp20827 extends XKCommandOpmode {
                 () -> {
                     boolean rt = gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5;
                     boolean lt = gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5;
-                    return (!rt && !lt);
+                    return (!rt && !lt && !gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER));
                 }
         );
 
@@ -120,6 +118,14 @@ public class TeleOp20827 extends XKCommandOpmode {
         ).whenPressed(
                 shooter.allowBallPass(),
                 intake.startIntake(false)
+        ).whenReleased(
+            stopIfNoTriggers
+        );
+
+        new ButtonEx(
+            ()-> gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)
+        ).whenPressed(
+            intake.outTake()
         ).whenReleased(
             stopIfNoTriggers
         );
@@ -147,6 +153,15 @@ public class TeleOp20827 extends XKCommandOpmode {
         ).whenPressed(
             /* Assumption: shooter40cm corresponds to LOW mode */
             shooter.setShooter(Constants.shooter40cm)
+        ).whenReleased(
+            shooter.setShooter(Constants.shooterStop)
+        );
+
+        new ButtonEx(
+            ()-> gamepad2.getButton(GamepadKeys.Button.A)
+        ).whenPressed(
+            /* Assumption: shooter40cm corresponds to LOW mode */
+            shooter.setShooter(Constants.shooterFar)
         ).whenReleased(
             shooter.setShooter(Constants.shooterStop)
         );
